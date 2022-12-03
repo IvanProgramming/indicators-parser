@@ -24,5 +24,8 @@ before_script:
   - pip install -r requirements.txt
 
 test:
+  tags:
+    - docker
   script:
-  - pytest
+    - pytest
+
