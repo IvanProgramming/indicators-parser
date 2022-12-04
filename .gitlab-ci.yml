@@ -1,4 +1,3 @@
-
 image: python:latest
 
 # Change pip's cache directory to be inside the project directory since we can
@@ -26,6 +25,7 @@ before_script:
 test:
   tags:
     - docker
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/.'
   script:
-    - pytest
+    - pytest --cov
 
