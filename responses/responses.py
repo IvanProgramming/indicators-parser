@@ -10,17 +10,12 @@ from starlette.responses import JSONResponse
 class ResponseModel(BaseModel):
     """
         Base response model, all success responses should be wrapped like this
-
-        Attributes
-        ----------
-        ok : bool
-            Shows is response contains error
-        data : any
-            Dict or Pydantic object with data
     """
 
     ok = True
+    """ Shows is response contains error """
     data: Any
+    """ Dict or Pydantic object with data """
 
     class Config:
         json_encoders = {
