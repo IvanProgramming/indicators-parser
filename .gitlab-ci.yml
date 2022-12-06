@@ -22,8 +22,3 @@ test:
   script:
     - pytest --cov
 
-count_lines:
-  tags:
-    - docker
-  script:
-    - git ls-files | wc -l
