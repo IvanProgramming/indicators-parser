@@ -4,7 +4,7 @@ from tortoise import Tortoise
 
 from connection import init_database_connection
 from endpoints.routes import routes
-from models import User
+from responses.errors import ApiError, handle_api_error
 
 
 async def on_start():
@@ -17,7 +17,9 @@ async def on_stop():
     await Tortoise.close_connections()
 
 
-app = Starlette(routes=routes, on_startup=[on_start])
+app = Starlette(routes=routes, on_startup=[on_start], on_shutdown=[on_stop], exception_handlers={
+    ApiError: handle_api_error
+})
 
 if __name__ == '__main__':
     from uvicorn import run
