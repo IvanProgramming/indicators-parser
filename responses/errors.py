@@ -1,3 +1,5 @@
+from starlette.requests import Request
+
 from responses.responses import BadResponse
 
 
@@ -12,11 +14,16 @@ class ApiError(Exception):
         return BadResponse(self.code, self.description, self.http_code)
 
 
+async def handle_api_error(req: Request, exc: ApiError):
+    """ ApiError default starlette handler """
+    return exc.as_response()
+
+
 class GithubBadCodeError(ApiError):
     """ GitHub callback code error """
     code = 101
     description = "Github authorization code is incorrect"
-    http_code = 412
+    http_code = 422
 
 
 class GithubError(ApiError):
@@ -24,3 +31,10 @@ class GithubError(ApiError):
     code = 102
     description = "Github authorization error"
     http_code = 500
+
+
+class NoGithubCode(ApiError):
+    """ No GitHub auth code provided """
+    code = 103
+    description = "Github code not provided"
+    http_code = 422
