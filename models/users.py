@@ -10,6 +10,10 @@ class User(Model):
     is_admin = fields.BooleanField(default=False)
     is_private = fields.BooleanField(default=False)
 
+    def create_token(self):
+        """ Creates JWT token for user """
+
+
     class Meta:
         table = "users"
 
