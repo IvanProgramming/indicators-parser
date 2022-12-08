@@ -5,25 +5,17 @@ from starlette.applications import Starlette
 from tortoise import Tortoise
 from sys import argv
 
+from auth.key import key
 from auth.utils import create_and_save_key
 from connection import init_database_connection
 from endpoints.routes import routes
 from responses.errors import ApiError, handle_api_error
 
-
-async def on_start():
-    """ This function is running on start of Starlette App """
-    await init_database_connection()
-
-
-async def on_stop():
-    """ This function is running on stop of Starlette App """
-    await Tortoise.close_connections()
-
-
-app = Starlette(routes=routes, on_startup=[on_start], on_shutdown=[on_stop], exception_handlers={
-    ApiError: handle_api_error
-})
+app = Starlette(routes=routes, on_startup=[init_database_connection, key.load_key],
+                on_shutdown=[Tortoise.close_connections],
+                exception_handlers={
+                    ApiError: handle_api_error
+                })
 
 if __name__ == '__main__':
     if len(argv) >= 2:

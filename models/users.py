@@ -1,5 +1,9 @@
+from datetime import datetime, timedelta
+
+from jwcrypto.jwt import JWT
 from pydantic import BaseModel
 from tortoise import Model, fields
+from auth.key import key
 
 
 class User(Model):
@@ -10,9 +14,16 @@ class User(Model):
     is_admin = fields.BooleanField(default=False)
     is_private = fields.BooleanField(default=False)
 
-    def create_token(self):
+    def create_token(self) -> str:
         """ Creates JWT token for user """
-
+        jwt = JWT(header={"alg": "RS256"}, claims={
+            "user_id": self.id,
+            "is_api_token": False,
+            "exp": int((datetime.now() + timedelta(days=30)).timestamp()),
+            "iss": "ioc"
+        })
+        jwt.make_signed_token(key.jwk)
+        return jwt.serialize()
 
     class Meta:
         table = "users"
