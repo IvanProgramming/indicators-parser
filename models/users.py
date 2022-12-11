@@ -25,6 +25,14 @@ class User(Model):
         jwt.make_signed_token(key.jwk)
         return jwt.serialize()
 
+    @staticmethod
+    async def generate_id() -> int:
+        """ Creates new ID for user, according to all existing users """
+        user = await User.all().order_by("-id").first()
+        if user is None:
+            return 1
+        return user.id + 1
+
     class Meta:
         table = "users"
 

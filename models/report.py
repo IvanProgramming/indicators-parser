@@ -10,7 +10,7 @@ from models.users import UserPD
 class Report(Model):
     """ ORM Model of Loaded for parsing report """
     id = fields.UUIDField(pk=True)
-    owner = fields.ForeignKeyField('User', on_delete=fields.CASCADE)
+    owner = fields.ForeignKeyField('models.User', on_delete=fields.CASCADE)
     mime = fields.CharField(max_length=64)
     loaded_at = fields.DatetimeField(auto_now=True)
     is_public = fields.BooleanField(default=False)

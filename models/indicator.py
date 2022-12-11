@@ -13,7 +13,7 @@ class IndicatorGroup(Model):
     """ ORM Model of Indicators Group """
     id = fields.UUIDField(pk=True)
     description = fields.TextField(null=True)
-    owner = fields.ForeignKeyField('User')
+    owner = fields.ForeignKeyField('models.User')
 
 
 class IndicatorType(Enum):
@@ -28,9 +28,9 @@ class Indicator(Model):
     id = fields.UUIDField(pk=True)
     type = fields.CharEnumField(IndicatorType)
     value = fields.TextField()
-    owner = fields.ForeignKeyField('User', on_delete=fields.SET_NULL)
-    group = fields.ForeignKeyField('IndicatorGroup', on_delete=fields.SET_NULL)
-    report = fields.ForeignKeyField('Report', on_delete=fields.SET_NULL)
+    owner = fields.ForeignKeyField('models.User', on_delete=fields.SET_NULL, null=True)
+    group = fields.ForeignKeyField('models.IndicatorGroup', on_delete=fields.SET_NULL, null=True)
+    report = fields.ForeignKeyField('models.Report', on_delete=fields.SET_NULL, null=True)
 
 
 class IndicatorGroupPD(BaseModel):
