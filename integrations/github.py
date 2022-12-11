@@ -22,7 +22,6 @@ class GithubAPI:
             "code": oauth_code
         }, headers={"Accept": "application/json"}) as resp:
             req_data = await resp.json()
-            print(req_data)
             if "error" in req_data:
                 if req_data["error"] == "bad_verification_code":
                     raise GithubBadCodeError
