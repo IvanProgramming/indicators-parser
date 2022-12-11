@@ -1,13 +1,12 @@
 import asyncio
 import os
 import pytest
-from pytest_asyncio.plugin import SubRequest
 from tortoise import Tortoise
-from tortoise.contrib.test import finalizer, initializer
 from tortoise.exceptions import DBConnectionError, OperationalError
 
 from auth.key import key
 from auth.utils import create_and_save_key
+from tests.fixtures.tortoise import user
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -48,4 +47,7 @@ def load_key():
     create_and_save_key("test_key.jwk")
     key.load_key("test_key.jwk")
     yield
-    os.remove("test_key.jwk")
+    try:
+        os.remove("test_key.jwk")
+    except FileNotFoundError:
+        pass

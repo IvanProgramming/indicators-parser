@@ -2,7 +2,6 @@ import pytest
 from starlette.testclient import TestClient
 
 from app import app
-from tests.fixtures.tortoise import user
 
 
 @pytest.fixture

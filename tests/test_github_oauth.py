@@ -9,11 +9,10 @@ from models import User
 from responses.errors import NoGithubCode
 from tests.fixtures.aioresponse import mocked
 from tests.fixtures.client import sti
-from tests.fixtures.tortoise import remove_db_on_end
 
 
 @pytest.mark.asyncio
-async def test_github_oauth(sti, mocked, remove_db_on_end):
+async def test_github_oauth(sti, mocked):
     mocked.post("https://github.com/login/oauth/access_token", status=200, body=dumps({
         "access_token": "ghAAAA",
         "scope": "repo,gist",
