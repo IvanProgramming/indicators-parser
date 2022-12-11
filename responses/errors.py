@@ -38,3 +38,17 @@ class NoGithubCode(ApiError):
     code = 103
     description = "Github code not provided"
     http_code = 422
+
+
+class TokenUndefinedError(ApiError):
+    """ No token provided in auth-required request """
+    code = 204
+    description = "Unauthenticated"
+    http_code = 401
+
+
+class UserDontExist(ApiError):
+    """ Got empty user on query from user_id in token """
+    code = 205
+    description = "User doesn't exist"
+    http_code = 401

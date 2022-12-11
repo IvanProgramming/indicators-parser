@@ -1,13 +1,19 @@
 from json import dumps
 from urllib.parse import urlparse
 
+import pytest
+
+from auth.key import decrypt_token, key
+from auth.utils import create_and_save_key
+from models import User
 from responses.errors import NoGithubCode
-from responses.responses import BadResponse
 from tests.fixtures.aioresponse import mocked
 from tests.fixtures.client import sti
+from tests.fixtures.tortoise import remove_db_on_end
 
 
-def test_github_oauth(sti, mocked):
+@pytest.mark.asyncio
+async def test_github_oauth(sti, mocked, remove_db_on_end):
     mocked.post("https://github.com/login/oauth/access_token", status=200, body=dumps({
         "access_token": "ghAAAA",
         "scope": "repo,gist",
@@ -18,7 +24,12 @@ def test_github_oauth(sti, mocked):
     resp = sti.get("/oauth/github?code=12345", follow_redirects=False)
 
     assert resp.status_code == 301
-    assert resp.headers.get("Set-Cookie") == "token=[user=54&login=krol]"
+    token = resp.cookies.get("token")
+    claims = decrypt_token(token)
+    uid = claims["user_id"]
+
+    user = await User.get(id=uid)
+    assert user.github_user_id == 54
 
 
 def test_github_oauth_no_code(sti):

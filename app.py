@@ -5,17 +5,31 @@ from starlette.applications import Starlette
 from tortoise import Tortoise
 from sys import argv
 
+from tortoise.contrib.starlette import register_tortoise
+
 from auth.key import key
 from auth.utils import create_and_save_key
-from connection import init_database_connection
 from endpoints.routes import routes
 from responses.errors import ApiError, handle_api_error
+from settings import DB_URI
 
-app = Starlette(routes=routes, on_startup=[init_database_connection, key.load_key],
+app = Starlette(routes=routes, on_startup=[key.load_key],
                 on_shutdown=[Tortoise.close_connections],
                 exception_handlers={
                     ApiError: handle_api_error
                 })
+
+register_tortoise(app, config={
+    'connections': {
+        'default': DB_URI
+    },
+    'apps': {
+        'models': {
+            'models': ['models'],
+            'default_connection': 'default',
+        }
+    }
+}, generate_schemas=True)
 
 if __name__ == '__main__':
     if len(argv) >= 2:
