@@ -24,6 +24,7 @@ def db() -> None:
         }
     }
 
+    # Copied from https://github.com/tortoise/tortoise-orm/issues/1110#issuecomment-1141969706
     async def _init_db() -> None:
         await Tortoise.init(config)
         try:
@@ -36,6 +37,7 @@ def db() -> None:
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(_init_db())
+    # Copied from https://github.com/tortoise/tortoise-orm/issues/1110#issuecomment-1141969706
     yield
     loop = asyncio.new_event_loop()
     loop.run_until_complete(Tortoise._drop_databases())
