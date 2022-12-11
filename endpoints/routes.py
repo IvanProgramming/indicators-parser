@@ -1,6 +1,8 @@
-from starlette.routing import Route
+from starlette.middleware import Middleware
+from starlette.routing import Route, Mount
 
 from endpoints import *
+from auth.middleware import JWTAuthenticationMiddleware
 
 unauthenticated_routes = [
     Route("/ping", ping, methods=["GET"]),
@@ -8,10 +10,18 @@ unauthenticated_routes = [
     Route("/oauth/github", github_oauth_callback, methods=["GET"])
 ]
 
-api_available_routes = []
-
-user_only_routes = []
+api_routes = [
+    Route("/getMe", get_me, methods=["GET"]),
+]
 
 admin_routes = []
 
-routes = unauthenticated_routes + api_available_routes + user_only_routes + admin_routes
+routes = [
+    Mount(
+        "/api", routes=api_routes,
+        middleware=[Middleware(JWTAuthenticationMiddleware)]
+    ),
+    Mount(
+        "/", routes=unauthenticated_routes,
+    )
+]
