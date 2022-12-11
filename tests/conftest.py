@@ -9,7 +9,7 @@ from auth.utils import create_and_save_key
 from tests.fixtures.tortoise import user
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def db() -> None:
     config = {
         'connections': {
