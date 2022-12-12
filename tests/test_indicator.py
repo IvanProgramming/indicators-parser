@@ -40,7 +40,7 @@ async def test_load_pdf_endpoint(user, sti_auth):
     assert resp.status_code == 200
     data = resp.json()["data"]
 
-    group_id = data["group"]["id"]
+    group_id = data["indicator_group"]["id"]
     group = await IndicatorGroup.get(id=group_id)
     count_of_indicators = await Indicator.filter(group=group).count()
 
