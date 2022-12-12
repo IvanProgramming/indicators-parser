@@ -66,3 +66,11 @@ def test_indicator_endpoint(sti_auth, group):
     assert resp.status_code == 200
 
     assert len(resp.json()["data"]["indicators"]) == 3
+
+
+def test_indicator_endpoint_pagination(sti_auth, group):
+    resp = sti_auth.get(f"/api/getIndicatorsFromGroup?group_id={group.id}&page=2")
+
+    assert resp.status_code == 200
+
+    assert len(resp.json()["data"]["indicators"]) == 0
