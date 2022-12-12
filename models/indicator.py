@@ -1,12 +1,13 @@
 from enum import Enum
 from typing import Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel
 from tortoise import Model, fields
 
-from models.report import ReportPD
-from models.users import UserPD
+from models.report import ReportPD, Report
+from models.users import UserPD, User
+from parsers.text_parser import CollectedData
 
 
 class IndicatorGroup(Model):
@@ -15,12 +16,49 @@ class IndicatorGroup(Model):
     description = fields.TextField(null=True)
     owner = fields.ForeignKeyField('models.User')
 
+    @staticmethod
+    async def from_reports_collected_data(data: CollectedData, owner: User, report: Report = None):
+        """ Creates indicators group from collected data """
+        group = IndicatorGroup(
+            description=None if report is None else f"Created from report {report.id}",
+            owner=owner,
+        )
+        await group.save()
+        indicators = []
+
+        for indicator in data.hashes:
+            indicators.append(Indicator(
+                id=str(uuid4()),
+                value=indicator,
+                type=IndicatorType.HASH,
+                group=group,
+                report=report,
+            ))
+        for indicator in data.urls:
+            indicators.append(Indicator(
+                id=str(uuid4()),
+                value=indicator,
+                type=IndicatorType.URL,
+                group=group,
+                report=report,
+            ))
+        for indicator in data.ips:
+            indicators.append(Indicator(
+                id=str(uuid4()),
+                value=indicator,
+                type=IndicatorType.IP_ADDRESS,
+                group=group,
+                report=report,
+            ))
+        await Indicator.bulk_create(indicators)
+        return group
+
 
 class IndicatorType(Enum):
     """ Enum type for Indicator """
     HASH = "HASH"
-    DOMAIN = "DOMAIN"
     IP_ADDRESS = "IP_ADDRESS"
+    URL = "URL"
 
 
 class Indicator(Model):
@@ -42,6 +80,9 @@ class IndicatorGroupPD(BaseModel):
     """ Optional description of group """
     owner: Optional[UserPD]
     """ Group owner """
+
+    class Config:
+        orm_mode = True
 
 
 class IndicatorPD(BaseModel):

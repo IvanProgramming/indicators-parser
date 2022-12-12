@@ -52,3 +52,17 @@ class UserDontExist(ApiError):
     code = 205
     description = "User doesn't exist"
     http_code = 401
+
+
+class InvalidToken(ApiError):
+    """ Invalid token provided """
+    code = 206
+    description = "Invalid token"
+    http_code = 403
+
+
+class ReportNotPresented(ApiError):
+    """ Report not found in database """
+    code = 301
+    description = "Report not presented in request or has invalid format"
+    http_code = 422

@@ -24,15 +24,26 @@ class ResponseModel(BaseModel):
         }
 
 
+# From https://github.com/ijl/orjson/issues/188
+def default(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    raise TypeError
+
+
+# From https://github.com/ijl/orjson/issues/188
+
 class OkResponse(JSONResponse):
     """ OK Response, might use pydantic object or just dict """
+
     def render(self, content: Any) -> bytes:
         as_json = ResponseModel(data=content).dict()
-        return dumps(as_json, option=orjson.OPT_OMIT_MICROSECONDS)
+        return dumps(as_json, option=orjson.OPT_OMIT_MICROSECONDS, default=default)
 
 
 class BadResponse(JSONResponse):
     """ Error response, might be returned by exception """
+
     def __init__(self, error_code: int, description: str, status_code: int):
         """
             Constructor
