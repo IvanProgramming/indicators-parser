@@ -73,3 +73,10 @@ class IndicatorGroupDoesNotExist(ApiError):
     code = 402
     description = "Indicator group does not exist"
     http_code = 404
+
+
+class BotTokenDontExist(ApiError):
+    """ Bot token not found in database """
+    code = 503
+    description = "Bot token does not exist"
+    http_code = 404
