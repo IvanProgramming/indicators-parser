@@ -1,7 +1,9 @@
 from json import load
 
+from jwcrypto.jws import InvalidJWSSignature
 from orjson import loads
 
+from responses.errors import InvalidToken
 from settings import JWK_KEY_FILE
 
 from jwcrypto.jwk import JWK
@@ -33,8 +35,10 @@ def decrypt_token(token: str):
     Returns:
         Decrypted claims
     """
-
-    jwt = JWT(key=key.jwk, jwt=token)
+    try:
+        jwt = JWT(key=key.jwk, jwt=token)
+    except InvalidJWSSignature:
+        raise InvalidToken
     return loads(jwt.claims)
 
 
