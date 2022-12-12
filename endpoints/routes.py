@@ -12,7 +12,8 @@ unauthenticated_routes = [
 
 api_routes = [
     Route("/getMe", get_me, methods=["GET"]),
-    Route("/loadReport", load_report, methods=["POST"])
+    Route("/loadReport", load_report, methods=["POST"]),
+    Route("/getIndicatorsFromGroup", get_indicators_from_group, methods=["GET"]),
 ]
 
 admin_routes = []

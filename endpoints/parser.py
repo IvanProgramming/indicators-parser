@@ -2,7 +2,7 @@ import os
 from uuid import uuid4
 from tempfile import NamedTemporaryFile
 
-from starlette.background import BackgroundTask, BackgroundTasks
+from starlette.background import BackgroundTasks
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
 

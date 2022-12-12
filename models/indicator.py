@@ -100,3 +100,11 @@ class IndicatorPD(BaseModel):
     """ Group, that has this indicator as its member, NULL on unset """
     report: Optional[ReportPD]
     """ Report, that was parsed to get this indicator, NULL on unset """
+
+    class Config:
+        orm_mode = True
+        fields = {
+            "owner": {"exclude": True},
+            "group": {"exclude": True},
+            "report": {"exclude": True},
+        }

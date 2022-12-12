@@ -66,3 +66,10 @@ class ReportNotPresented(ApiError):
     code = 301
     description = "Report not presented in request or has invalid format"
     http_code = 422
+
+
+class IndicatorGroupDoesNotExist(ApiError):
+    """ Indicator group not found in database """
+    code = 402
+    description = "Indicator group does not exist"
+    http_code = 404
