@@ -3,9 +3,11 @@ from requests import get
 
 from models.indicator import IndicatorGroup, Indicator, IndicatorType
 from parsers.text_parser import CollectedData
-from responses.errors import ReportNotPresented
+from responses.errors import ReportNotPresented, IndicatorGroupDoesNotExist
 from tests.fixtures.tortoise import user
 from tests.fixtures.client import sti_auth
+from tests.fixtures.indicators import mts_report
+from tests.fixtures.indicators import group
 
 
 @pytest.mark.asyncio
@@ -30,13 +32,8 @@ async def test_indicator_group_from_reports_collected_data(user):
 
 
 @pytest.mark.asyncio
-async def test_load_pdf_endpoint(user, sti_auth):
-    pdf_url = "https://storage.yandexcloud.net/ivanprogramming/Network_Report.pdf"
-    pdf_path = "Network_Report.pdf"
-    with open(pdf_path, "wb") as f:
-        f.write(get(pdf_url).content)
-
-    resp = sti_auth.post("/api/loadReport", files={"file": open(pdf_path, "rb")})
+async def test_load_pdf_endpoint(user, sti_auth, mts_report):
+    resp = sti_auth.post("/api/loadReport", files={"file": open(mts_report, "rb")})
     assert resp.status_code == 200
     data = resp.json()["data"]
 
@@ -53,3 +50,19 @@ def test_load_pdf_endpoint_no_file(sti_auth):
     assert resp.status_code == 422
     assert not resp.json()["ok"]
     assert resp.json()["data"]["error_code"] == ReportNotPresented.code
+
+
+def test_indicator_endpoint_not_found(sti_auth, group):
+    resp = sti_auth.get("/api/getIndicatorsFromGroup?group_id=not-exists")
+
+    assert resp.status_code == 404
+    assert not resp.json()["ok"]
+    assert resp.json()["data"]["error_code"] == IndicatorGroupDoesNotExist.code
+
+
+def test_indicator_endpoint(sti_auth, group):
+    resp = sti_auth.get(f"/api/getIndicatorsFromGroup?group_id={group.id}")
+
+    assert resp.status_code == 200
+
+    assert len(resp.json()["data"]["indicators"]) == 3
