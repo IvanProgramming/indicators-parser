@@ -67,6 +67,7 @@ def filter_invalid_ips(ips: Iterable[str]) -> list:
 def find_ioc(text: str) -> CollectedData:
     """
     Finds hashes, IPs and URLs in the text
+
     Args:
         text (str): Text to search for hashes, IPs and URLs
 
