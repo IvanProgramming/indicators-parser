@@ -80,3 +80,10 @@ class BotTokenDontExist(ApiError):
     code = 503
     description = "Bot token does not exist"
     http_code = 404
+
+
+class TelegramInvalidLink(ApiError):
+    """ Telegram link is invalid """
+    code = 604
+    description = "Telegram channel join link is invalid"
+    http_code = 400

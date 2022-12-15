@@ -12,9 +12,14 @@ from auth.utils import create_and_save_key
 from endpoints.routes import routes
 from responses.errors import ApiError, handle_api_error
 from settings import DB_URI
+from integrations.telegram import client
 
-app = Starlette(routes=routes, on_startup=[key.load_key],
-                on_shutdown=[Tortoise.close_connections],
+
+async def start_client():
+    await client.start()
+
+
+app = Starlette(routes=routes, on_startup=[key.load_key, start_client], on_shutdown=[client.disconnect],
                 exception_handlers={
                     ApiError: handle_api_error
                 })
@@ -39,6 +44,9 @@ if __name__ == '__main__':
                 if select.lower() != "y":
                     exit()
             create_and_save_key()
+        elif argv[1] == "generate_client":
+            client.start()
+            exit()
         else:
             logger.error("Unknown command")
     else:

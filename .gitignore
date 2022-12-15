@@ -306,3 +306,7 @@ pip-selfcheck.json
 /.idea/vcs.xml
 
 *.jwk
+
+# Telethon
+ioc.session
+tests/ioc.session

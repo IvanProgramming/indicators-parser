@@ -7,7 +7,6 @@ from tortoise import Model, fields
 
 from models.report import ReportPD, Report
 from models.users import UserPD, User
-from parsers.text_parser import CollectedData
 
 
 class IndicatorGroup(Model):
@@ -17,39 +16,20 @@ class IndicatorGroup(Model):
     owner = fields.ForeignKeyField('models.User')
 
     @staticmethod
-    async def from_reports_collected_data(data: CollectedData, owner: User, report: Report = None):
-        """ Creates indicators group from collected data """
+    async def from_reports_collected_data(data, owner: User, report: Report = None):
+        """ Creates indicators group from collected data
+
+        Args:
+            report: Optional report, bound to indicators group
+            owner: Owner of indicators and indicators group
+            data (CollectedData): Collected data from report
+        """
         group = IndicatorGroup(
             description=None if report is None else f"Created from report {report.id}",
             owner=owner,
         )
         await group.save()
-        indicators = []
-
-        for indicator in data.hashes:
-            indicators.append(Indicator(
-                id=str(uuid4()),
-                value=indicator,
-                type=IndicatorType.HASH,
-                group=group,
-                report=report,
-            ))
-        for indicator in data.urls:
-            indicators.append(Indicator(
-                id=str(uuid4()),
-                value=indicator,
-                type=IndicatorType.URL,
-                group=group,
-                report=report,
-            ))
-        for indicator in data.ips:
-            indicators.append(Indicator(
-                id=str(uuid4()),
-                value=indicator,
-                type=IndicatorType.IP_ADDRESS,
-                group=group,
-                report=report,
-            ))
+        indicators = data.indicators(owner=owner, indicator_group=group, report=report)
         await Indicator.bulk_create(indicators)
         return group
 

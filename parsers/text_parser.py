@@ -1,7 +1,11 @@
 from re import findall
-from typing import Set, Iterable
+from typing import Set, Iterable, List
+from uuid import uuid4
 
 from pydantic import BaseModel, IPvAnyAddress, AnyUrl
+
+from models import User, IndicatorGroup, Report, Indicator
+from models.indicator import IndicatorType
 
 
 class CollectedData(BaseModel):
@@ -13,6 +17,59 @@ class CollectedData(BaseModel):
     """ Set of IPs found in the text """
     urls: Set[AnyUrl] = set()
     """ Set of URLs found in the text """
+
+    def indicators(self, owner: User = None, indicator_group: IndicatorGroup = None, report: Report = None,
+                   group_id: str = None, report_id: str = None, owner_id: str = None) -> \
+            List[Indicator]:
+        """
+            Creates indicators from collected data
+        Args:
+            owner_id: Optional. ID of owner
+            report_id: Optional. ID of report
+            group_id: Optional. ID of group
+            owner: User who owns indicators
+            indicator_group: Optional indicator group
+            report: Optional report
+
+        Returns:
+            List of indicators
+        """
+        indicators = []
+        if owner is not None:
+            owner_id = owner.id
+        if indicator_group is not None:
+            group_id = indicator_group.id
+        if report is not None:
+            report_id = report.id
+
+        for indicator in self.hashes:
+            indicators.append(Indicator(
+                id=str(uuid4()),
+                value=indicator,
+                type=IndicatorType.HASH,
+                report_id=report_id,
+                group_id=group_id,
+                owner_id=owner_id
+            ))
+        for indicator in self.urls:
+            indicators.append(Indicator(
+                id=str(uuid4()),
+                value=indicator,
+                type=IndicatorType.URL,
+                report_id=report_id,
+                group_id=group_id,
+                owner_id=owner_id
+            ))
+        for indicator in self.ips:
+            indicators.append(Indicator(
+                id=str(uuid4()),
+                value=indicator,
+                type=IndicatorType.IP_ADDRESS,
+                report_id=report_id,
+                group_id=group_id,
+                owner_id=owner_id
+            ))
+        return indicators
 
 
 def filter_already_found_hashes(new_hashes: list, already_found_hashes: list) -> list:
