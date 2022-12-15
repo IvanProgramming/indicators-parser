@@ -19,6 +19,6 @@ ENDPOINT_URL = getenv("S3_ENDPOINT_URL")
 REPORTS_FOLDER = getenv("S3_REPORTS_FOLDER") if getenv("S3_REPORTS_FOLDER") is not None else "reports"
 S3_BASE_URL = getenv("S3_BASE_URL")
 
-TELEGRAM_API_ID = int(getenv("TELEGRAM_API_ID"))
+TELEGRAM_API_ID = int(getenv("TELEGRAM_API_ID") if getenv("TELEGRAM_API_ID") is not None else 0)
 TELEGRAM_API_HASH = getenv("TELEGRAM_API_HASH")
 TELEGRAM_SESSION_NAME = getenv("TELEGRAM_SESSION_NAME") if getenv("TELEGRAM_SESSION_NAME") is not None else "ioc"
