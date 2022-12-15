@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 import pytest
 from requests import get
 
@@ -8,6 +10,7 @@ from tests.fixtures.tortoise import user
 from tests.fixtures.client import sti_auth
 from tests.fixtures.indicators import mts_report
 from tests.fixtures.indicators import group
+from random import randint
 
 
 @pytest.mark.asyncio
@@ -74,3 +77,21 @@ def test_indicator_endpoint_pagination(sti_auth, group):
     assert resp.status_code == 200
 
     assert len(resp.json()["data"]["indicators"]) == 0
+
+
+@pytest.mark.asyncio
+async def test_indicator_groups_endpoint(sti_auth, user):
+    groups_count = randint(5, 12)
+    groups = []
+    for _ in range(groups_count):
+        groups.append(IndicatorGroup(
+            id=str(uuid4()),
+            owner=user,
+            description="Test group"
+        ))
+    await IndicatorGroup.bulk_create(groups)
+
+    resp = sti_auth.get("/api/getIndicatorGroups")
+
+    assert resp.status_code == 200
+    assert len(resp.json()["data"]) == len(groups)
