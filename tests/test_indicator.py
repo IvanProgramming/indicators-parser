@@ -95,3 +95,15 @@ async def test_indicator_groups_endpoint(sti_auth, user):
 
     assert resp.status_code == 200
     assert len(resp.json()["data"]) == len(groups)
+
+
+def test_reports_endpoint(sti_auth, user, mts_report):
+    resp = sti_auth.post("/api/loadReport", files={"file": open(mts_report, "rb")})
+
+    assert resp.status_code == 200
+    report_id = resp.json()["data"]["report_id"]
+
+    resp_reports = sti_auth.get("/api/getReports")
+    assert 1 == len(resp_reports.json()["data"])
+    print(resp_reports.json())
+    assert resp_reports.json()["data"][0]["id"] == report_id

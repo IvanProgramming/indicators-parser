@@ -9,6 +9,7 @@ from starlette.requests import Request
 from integrations.s3 import save_report_to_s3
 from models import Report, IndicatorGroup
 from models.indicator import IndicatorGroupPD
+from models.report import ReportPD
 from parsers.pdf_parser import process_pdf
 from parsers.text_parser import CollectedData
 from responses.errors import ReportNotPresented
@@ -39,3 +40,13 @@ async def load_report(request: Request):
     background.add_task(save_report_to_s3, temp.name, report_id)
     background.add_task(os.remove, temp.name)
     return OkResponse({"report_id": report_id, "indicator_group": group_pd}, background=background)
+
+
+async def get_reports(request: Request):
+    """ Returns user's reports """
+    reports = await Report.filter(owner=request.state.user).all()
+    as_pd = []
+    for report in reports:
+        report.owner = request.state.user
+        as_pd.append(ReportPD.from_orm(report))
+    return OkResponse(as_pd)
