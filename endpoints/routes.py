@@ -20,7 +20,8 @@ api_routes = [
     Route("/deleteBotToken", delete_bot_token, methods=["GET"]),
     Route("/createWatcher", create_watcher, methods=["POST"]),
     Route("/getIndicatorGroups", get_indicator_groups, methods=["GET"]),
-    Route("/getReports", get_reports, methods=["GET"])
+    Route("/getReports", get_reports, methods=["GET"]),
+    Route("/loadPageReport", get_page_report, methods=["GET"]),
 ]
 
 admin_routes = []

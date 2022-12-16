@@ -87,3 +87,10 @@ class TelegramInvalidLink(ApiError):
     code = 604
     description = "Telegram channel join link is invalid"
     http_code = 400
+
+
+class ReportURLError(ApiError):
+    """ Report URL is invalid """
+    code = 701
+    description = "Report URL is invalid, or 200 status code is not returned"
+    http_code = 422

@@ -107,3 +107,33 @@ def test_reports_endpoint(sti_auth, user, mts_report):
     assert 1 == len(resp_reports.json()["data"])
     print(resp_reports.json())
     assert resp_reports.json()["data"][0]["id"] == report_id
+
+
+def test_parse_link_report_empty(sti_auth):
+    test_url = "https://storage.yandexcloud.net/ivanprogramming/empty_report.html"
+
+    resp = sti_auth.get(f"/api/loadPageReport?url={test_url}")
+    assert resp.status_code == 200
+
+    data = resp.json()["data"]
+    report_id = data["indicator_group"]["id"]
+
+    resp = sti_auth.get(f"/api/getIndicatorsFromGroup?group_id={report_id}")
+    assert resp.status_code == 200
+
+    assert len(resp.json()["data"]["indicators"]) == 0
+
+
+def test_parse_link_report(sti_auth):
+    test_url = "https://storage.yandexcloud.net/ivanprogramming/report.html"
+
+    resp = sti_auth.get(f"/api/loadPageReport?url={test_url}")
+    assert resp.status_code == 200
+
+    data = resp.json()["data"]
+    report_id = data["indicator_group"]["id"]
+
+    resp = sti_auth.get(f"/api/getIndicatorsFromGroup?group_id={report_id}")
+    assert resp.status_code == 200
+
+    assert len(resp.json()["data"]["indicators"]) == 3

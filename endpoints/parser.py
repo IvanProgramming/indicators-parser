@@ -2,6 +2,7 @@ import os
 from uuid import uuid4
 from tempfile import NamedTemporaryFile
 
+from aiohttp import request as aiohttp_request
 from starlette.background import BackgroundTasks
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
@@ -11,8 +12,8 @@ from models import Report, IndicatorGroup
 from models.indicator import IndicatorGroupPD
 from models.report import ReportPD
 from parsers.pdf_parser import process_pdf
-from parsers.text_parser import CollectedData
-from responses.errors import ReportNotPresented
+from parsers.text_parser import CollectedData, find_ioc
+from responses.errors import ReportNotPresented, ReportURLError
 from responses.responses import OkResponse
 
 
@@ -50,3 +51,21 @@ async def get_reports(request: Request):
         report.owner = request.state.user
         as_pd.append(ReportPD.from_orm(report))
     return OkResponse(as_pd)
+
+
+async def get_page_report(request: Request):
+    """ Creates group from news page """
+    url = request.query_params["url"]
+    try:
+        async with aiohttp_request("GET", url) as resp:
+            page = await resp.text()
+            if resp.status != 200:
+                raise ReportURLError
+    except Exception:
+        raise ReportURLError
+    data = find_ioc(page.lower())
+    group = await IndicatorGroup.from_reports_collected_data(data, request.state.user)
+    group.description = "Group from page " + url
+    await group.save()
+    group_pd = IndicatorGroupPD.from_orm(group)
+    return OkResponse({"indicator_group": group_pd})
