@@ -2,7 +2,6 @@ from os.path import exists
 
 from loguru import logger
 from starlette.applications import Starlette
-from tortoise import Tortoise
 from sys import argv
 
 from tortoise.contrib.starlette import register_tortoise
@@ -12,14 +11,9 @@ from auth.utils import create_and_save_key
 from endpoints.routes import routes
 from responses.errors import ApiError, handle_api_error
 from settings import DB_URI
-from integrations.telegram import client
+from integrations.telegram import start, client
 
-
-async def start_client():
-    await client.start()
-
-
-app = Starlette(routes=routes, on_startup=[key.load_key, start_client], on_shutdown=[client.disconnect],
+app = Starlette(routes=routes, on_startup=[key.load_key, start],
                 exception_handlers={
                     ApiError: handle_api_error
                 })

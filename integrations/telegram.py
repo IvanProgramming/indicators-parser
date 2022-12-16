@@ -25,3 +25,8 @@ async def on_message(event: Message):
                                                                         owner_id=watcher.owner_id)
                 if len(created_indicators) > 0:
                     await Indicator.bulk_create(created_indicators)
+
+
+async def start():
+    """ Starts the Telegram client """
+    await client.start()

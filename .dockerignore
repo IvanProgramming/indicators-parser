@@ -1,0 +1,7 @@
+venv/
+README.md
+.env
+.coverage
+key.jwk
+*.session
+*.sqlite3
