@@ -5,3 +5,4 @@ from .parser import load_report
 from .indicators import get_indicators_from_group, get_indicator_groups
 from .watcher import create_watcher
 from .parser import get_reports
+from .static import token

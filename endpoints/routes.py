@@ -7,7 +7,8 @@ from auth.middleware import JWTAuthenticationMiddleware
 unauthenticated_routes = [
     Route("/ping", ping, methods=["GET"]),
     Route("/login/github", github_oauth_redirect, methods=["GET"]),
-    Route("/oauth/github", github_oauth_callback, methods=["GET"])
+    Route("/oauth/github", github_oauth_callback, methods=["GET"]),
+    Route("/token", token, methods=["GET"]),
 ]
 
 api_routes = [

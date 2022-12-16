@@ -27,7 +27,7 @@ async def github_oauth_callback(request: Request):
         )
         await user.save()
         token = user.create_token()
-    resp = RedirectResponse("/", 301)
+    resp = RedirectResponse("/token", 301)
     resp.set_cookie("token", token)
     return resp
 

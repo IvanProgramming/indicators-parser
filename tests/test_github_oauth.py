@@ -45,3 +45,16 @@ def test_github_oauth_redirect(sti):
     redirect_url = urlparse(resp.headers["Location"])
     assert redirect_url.path == "/login/oauth/authorize"
     assert redirect_url.hostname == "github.com"
+
+
+def test_login_redirect_token_page(mocked, sti):
+    mocked.post("https://github.com/login/oauth/access_token", status=200, body=dumps({
+        "access_token": "ghAAAA",
+        "scope": "repo,gist",
+        "token_type": "bearer"
+    }))
+    mocked.get("https://api.github.com/user", status=200, body=dumps({"login": "krol", "id": 54}))
+    resp = sti.get("/oauth/github?code=12345")
+
+    assert resp.status_code == 200
+    assert resp.headers["Content-Type"] == "text/html; charset=utf-8"
