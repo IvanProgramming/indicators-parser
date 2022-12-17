@@ -21,6 +21,7 @@ api_routes = [
     Route("/createWatcher", create_watcher, methods=["POST"]),
     Route("/getIndicatorGroups", get_indicator_groups, methods=["GET"]),
     Route("/getReports", get_reports, methods=["GET"]),
+    Route("/getReportFilePath", get_report_file, methods=["GET"]),
     Route("/loadPageReport", get_page_report, methods=["GET"]),
 ]
 

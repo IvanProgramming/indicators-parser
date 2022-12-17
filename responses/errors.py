@@ -68,6 +68,13 @@ class ReportNotPresented(ApiError):
     http_code = 422
 
 
+class ReportNotFound(ApiError):
+    """ Report not found in database """
+    code = 302
+    description = "Report not found in database"
+    http_code = 404
+
+
 class IndicatorGroupDoesNotExist(ApiError):
     """ Indicator group not found in database """
     code = 402

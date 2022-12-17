@@ -5,7 +5,7 @@ from requests import get
 
 from models.indicator import IndicatorGroup, Indicator, IndicatorType
 from parsers.text_parser import CollectedData
-from responses.errors import ReportNotPresented, IndicatorGroupDoesNotExist
+from responses.errors import ReportNotPresented, IndicatorGroupDoesNotExist, ReportNotFound
 from tests.fixtures.tortoise import user
 from tests.fixtures.client import sti_auth
 from tests.fixtures.indicators import mts_report
@@ -137,3 +137,26 @@ def test_parse_link_report(sti_auth):
     assert resp.status_code == 200
 
     assert len(resp.json()["data"]["indicators"]) == 3
+
+
+def test_report_link_generation(sti_auth, mts_report):
+    resp = sti_auth.post("/api/loadReport", files={"file": open(mts_report, "rb")})
+
+    assert resp.status_code == 200
+    report_id = resp.json()["data"]["report_id"]
+
+    resp = sti_auth.get(f"/api/getReportFilePath?report_id={report_id}")
+    assert resp.status_code == 200
+    link = resp.json()["data"]["link"]
+
+    print(link)
+
+    resp = get(link)
+    assert resp.status_code == 200
+
+
+def test_report_link_generation_not_found(sti_auth):
+    resp = sti_auth.get(f"/api/getReportFilePath?report_id=not-exists")
+    assert resp.status_code == 404
+    assert not resp.json()["ok"]
+    assert resp.json()["data"]["error_code"] == ReportNotFound.code

@@ -6,14 +6,15 @@ from aiohttp import request as aiohttp_request
 from starlette.background import BackgroundTasks
 from starlette.datastructures import UploadFile
 from starlette.requests import Request
+from tortoise.expressions import Q
 
-from integrations.s3 import save_report_to_s3
+from integrations.s3 import save_report_to_s3, generate_report_url
 from models import Report, IndicatorGroup
 from models.indicator import IndicatorGroupPD
 from models.report import ReportPD
 from parsers.pdf_parser import process_pdf
 from parsers.text_parser import CollectedData, find_ioc
-from responses.errors import ReportNotPresented, ReportURLError
+from responses.errors import ReportNotPresented, ReportURLError, ReportNotFound
 from responses.responses import OkResponse
 
 
@@ -69,3 +70,15 @@ async def get_page_report(request: Request):
     await group.save()
     group_pd = IndicatorGroupPD.from_orm(group)
     return OkResponse({"indicator_group": group_pd})
+
+
+async def get_report_file(request: Request):
+    """ Returns report file """
+    try:
+        report_id = request.query_params["report_id"]
+    except KeyError:
+        raise ReportNotFound
+    report = await Report.get_or_none(id=report_id)
+    if report is None or (report.owner_id != request.state.user.id and not report.is_public):
+        raise ReportNotFound
+    return OkResponse({"link": generate_report_url(report_id)})
